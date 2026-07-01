@@ -14,6 +14,24 @@ In the reviewed OFT path:
 
 This review is focused on the OFT contract / application layer path.
 
+## Main Flow
+
+```mermaid
+flowchart LR
+    A["send(...)"] --> B["_debit(...)"]
+    B --> C["_buildMsgAndOptions(...)"]
+    C --> D["_lzSend(...)"]
+    D --> E["LayerZero transport boundary"]
+    E --> F["_lzReceive(...)"]
+    F --> G["_credit(...)"]
+    G --> H["MINT"]
+    F --> I{"compose?"}
+    I -->|yes| J["endpoint.sendCompose(...)"]
+    I -->|no| K["finish receive path"]
+```
+
+This README shows the high-level OFT tree only. The full function-by-function flow tree and detailed reasoning are in `send-review.md`.
+
 ## Scope
 
 My current scope here is:
