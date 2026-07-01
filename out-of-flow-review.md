@@ -21,7 +21,36 @@ Invariants:
 
 - this function must not be callable by arbitrary users
 
-## 2. OAppCore._getPeerOrRevert(...)
+## 2. OAppReceiver.lzReceive(...)
+
+```solidity
+function lzReceive(
+    Origin calldata _origin,
+    bytes32 _guid,
+    bytes calldata _message,
+    address _executor,
+    bytes calldata _extraData
+) public payable virtual {
+    if (address(endpoint) != msg.sender) revert OnlyEndpoint(msg.sender);
+    if (_getPeerOrRevert(_origin.srcEid) != _origin.sender) revert OnlyPeer(_origin.srcEid, _origin.sender);
+
+    _lzReceive(_origin, _guid, _message, _executor, _extraData);
+}
+```
+
+What it does:
+
+- acts as the external receive entrypoint before normal OFT receive logic
+- checks the local LayerZero endpoint caller
+- checks that the remote sender matches the trusted peer for the source eid
+- only then forwards the message into the internal OFT receive path
+
+Invariants:
+
+- this function must not be callable by arbitrary users
+- the receive path must not accept a message from a non-trusted peer for the selected source eid
+
+## 3. OAppCore._getPeerOrRevert(...)
 
 ```solidity
 function _getPeerOrRevert(uint32 _eid) internal view virtual returns (bytes32) {
@@ -40,7 +69,7 @@ Invariants:
 
 - send path must not continue without a configured peer for the selected destination eid
 
-## 3. OAppCore.setDelegate(...)
+## 4. OAppCore.setDelegate(...)
 
 ```solidity
 function setDelegate(address _delegate) public onlyOwner {
@@ -56,7 +85,7 @@ Invariants:
 
 - this function must not be callable by arbitrary users
 
-## 4. OFTCore.setMsgInspector(...)
+## 5. OFTCore.setMsgInspector(...)
 
 ```solidity
 function setMsgInspector(address _msgInspector) public virtual onlyOwner {
@@ -73,7 +102,7 @@ Invariants:
 
 - this function must not be callable by arbitrary users
 
-## 5. OFTCore.quoteOFT(...)
+## 6. OFTCore.quoteOFT(...)
 
 ```solidity
 function quoteOFT(
@@ -104,7 +133,7 @@ Invariants:
 
 - quoteOFT(...) must not distort the amount preview returned by _debitView(...)
 
-## 6. OFTCore.quoteSend(...)
+## 7. OFTCore.quoteSend(...)
 
 ```solidity
 function quoteSend(
@@ -132,7 +161,7 @@ Invariants:
 
 - quoteSend(...) must quote the fee for the same message/options payload that the real send path would build
 
-## 7. OAppCore.isPeer(...)
+## 8. OAppCore.isPeer(...)
 
 ```solidity
 function isPeer(uint32 _eid, bytes32 _peer) public view virtual override returns (bool) {
@@ -144,7 +173,7 @@ What it does:
 
 - checks whether the provided peer matches the stored peer for the selected eid
 
-## 8. OAppPreCrimeSimulator._lzReceiveSimulate(...)
+## 9. OAppPreCrimeSimulator._lzReceiveSimulate(...)
 
 ```solidity
 function _lzReceiveSimulate(
