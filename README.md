@@ -4,6 +4,17 @@ This repository contains my review notes on the LayerZero V2 OFT path.
 
 <img width="2172" height="724" alt="image" src="https://github.com/user-attachments/assets/7fcc6560-0777-44cc-94a6-564392476c7b" />
 
+## What Is LayerZero OFT?
+
+LayerZero V2 OFT is an omnichain token model.
+
+At a high level, it allows token value to move from one chain to another through a send/receive path:
+
+- value leaves the source-side token path
+- a cross-chain message carries the transfer semantics through LayerZero delivery
+- value is credited on the destination-side token path
+
+In the plain OFT model reviewed here, the token itself owns that cross-chain send/receive logic.
 
 ## What This Review Covers
 
