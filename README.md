@@ -1,7 +1,9 @@
 # LayerZero V2 OFT Review
 
 This repository contains my review notes on the LayerZero V2 OFT path.
-![Uploading image.png…]()
+
+<img width="2172" height="724" alt="image" src="https://github.com/user-attachments/assets/7fcc6560-0777-44cc-94a6-564392476c7b" />
+
 
 ## What This Review Covers
 
