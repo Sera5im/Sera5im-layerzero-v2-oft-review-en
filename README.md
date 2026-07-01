@@ -16,18 +16,6 @@ At a high level, it allows token value to move from one chain to another through
 
 In the plain OFT model reviewed here, the token itself owns that cross-chain send/receive logic.
 
-## What This Review Covers
-
-LayerZero V2 OFT moves token value across chains through an omnichain token model.
-
-In the reviewed OFT path:
-
-- on send, the source-side amount is debited and encoded into an outbound cross-chain message
-- after transport delivery, the destination-side amount is credited through the OFT receive path
-- if compose mode is enabled, the receive side can continue into an additional compose branch
-
-This review is focused on the OFT contract / application layer path.
-
 ## Main Flow
 
 ```mermaid
@@ -85,6 +73,18 @@ flowchart LR
     A --> E["construct OFTReceipt struct"]
     A --> F["emit OFTSent(...)"]
 ```
+
+## What This Review Covers
+
+LayerZero V2 OFT moves token value across chains through an omnichain token model.
+
+In the reviewed OFT path:
+
+- on send, the source-side amount is debited and encoded into an outbound cross-chain message
+- after transport delivery, the destination-side amount is credited through the OFT receive path
+- if compose mode is enabled, the receive side can continue into an additional compose branch
+
+This review is focused on the OFT contract / application layer path.
 
 ## Scope
 
