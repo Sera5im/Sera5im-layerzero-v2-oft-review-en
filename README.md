@@ -18,19 +18,59 @@ This review is focused on the OFT contract / application layer path.
 
 ```mermaid
 flowchart LR
-    A["send(...)"] --> B["_debit(...)"]
-    B --> C["_buildMsgAndOptions(...)"]
-    C --> D["_lzSend(...)"]
-    D --> E["LayerZero transport boundary"]
-    E --> F["_lzReceive(...)"]
-    F --> G["_credit(...)"]
-    G --> H["MINT"]
-    F --> I{"compose?"}
-    I -->|yes| J["endpoint.sendCompose(...)"]
-    I -->|no| K["finish receive path"]
-```
+    A["send(...)"]
 
-This README shows the high-level OFT tree only. The full function-by-function flow tree and detailed reasoning are in `send-review.md`.
+    A --> B["_debit(...)"]
+    B --> B1["_debitView(...)"]
+    B1 --> B11["_removeDust(...)"]
+    B --> B2["_burn(...)"]
+    B2 --> B3["BURN"]
+
+    A --> C["_buildMsgAndOptions(...)"]
+    C --> C1["OFTMsgCodec.encode(...)"]
+    C1 --> C11["hasCompose = composeMsg.length > 0"]
+    C11 --> C12["msgType = SEND / SEND_AND_CALL"]
+
+    C --> C2["combineOptions(...)"]
+    C2 --> C21["enforcedOptions[_eid][_msgType]"]
+    C21 --> C22["if enforced.length == 0 -> return extraOptions"]
+    C21 --> C23["if extraOptions.length == 0 -> return enforced"]
+    C21 --> C24["if extraOptions.length >= 2"]
+    C24 --> C25["_assertOptionsType3(...)"]
+    C25 --> C26["bytes.concat(enforced, extraOptions[2:])"]
+    C24 --> C27["revert InvalidOptions(...)"]
+
+    C --> C3["msgInspector.inspect(message, options)"]
+
+    A --> D["_lzSend(...)"]
+    D --> D1["_payNative(...)"]
+    D1 --> D2{"lzTokenFee > 0?"}
+    D2 -->|yes| D3["_payLzToken(...)"]
+    D3 --> D4["endpoint.send(...)"]
+    D2 -->|no| D4
+
+    D4 --> T["LayerZero transport / message delivery"]
+
+    T --> R["_lzReceive(...)"]
+
+    R --> R1["_message.sendTo()"]
+    R1 --> R11["bytes32ToAddress()"]
+
+    R --> R2["_message.amountSD()"]
+    R2 --> R21["_toLD(...)"]
+    R21 --> R22["_credit(...)"]
+    R22 --> R23["MINT"]
+
+    R --> R3{"_message.isComposed()?"}
+    R3 -->|yes| R4["OFTComposeMsgCodec.encode(...)"]
+    R4 --> R5["endpoint.sendCompose(...)"]
+    R3 -->|no| R6["skip compose path"]
+
+    R --> R7["emit OFTReceived(...)"]
+
+    A --> E["construct OFTReceipt struct"]
+    A --> F["emit OFTSent(...)"]
+```
 
 ## Scope
 
