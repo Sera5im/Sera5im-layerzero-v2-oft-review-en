@@ -110,7 +110,7 @@ This repository is focused on the `OFT` path.
 
 ## Review Structure
 
-- [send-review.md](./send-review.md)
+- [send-review.md](./send-flow-review.md)
   Main OFT flow review covering the send path, transport boundary, receive path, destination-side credit, and compose continuation branch.
 
 - [out-of-flow-review.md](./out-of-flow-review.md)
